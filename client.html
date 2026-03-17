@@ -31,22 +31,22 @@
     <div id="quiz-container"></div>
 
     <script>
-        // --- THAY ĐOẠN NÀY BẰNG CỦA THẦY ---
+        // Cấu hình Firebase đã được chuẩn hóa
         const firebaseConfig = {
-  apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
-  authDomain: "zoomquizthcs.firebaseapp.com",
-  projectId: "zoomquizthcs",
-  storageBucket: "zoomquizthcs.firebasestorage.app",
-  messagingSenderId: "658234940012",
-  appId: "1:658234940012:web:c4015c6d0cc3e291669649",
-  measurementId: "G-TCHQ3KHWXM"
-};
+            apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
+            authDomain: "zoomquizthcs.firebaseapp.com",
+            databaseURL: "https://zoomquizthcs-default-rtdb.firebaseio.com",
+            projectId: "zoomquizthcs",
+            storageBucket: "zoomquizthcs.firebasestorage.app",
+            messagingSenderId: "658234940012",
+            appId: "1:658234940012:web:c4015c6d0cc3e291669649"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        // Khởi tạo Firebase v8
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-
+        // Danh sách câu hỏi
         const danhSachCauHoi = [
             { id: "q1", title: "1. Trong giai đoạn ôn thi, điều bố/ mẹ thường nói với con nhiều nhất là gì?", opts: { A: "“Học thêm chút nữa.”", B: "“Con cố gắng lên.”", C: "“Đừng chủ quan.”", D: "“Bố mẹ tin con.”" } },
             { id: "q2", title: "2. Trong giai đoạn ôn thi vào 10, điều khiến bố/ mẹ lo nhất là gì?", opts: { A: "Con học chưa đủ nhiều.", B: "Con thiếu tự tin.", C: "Con chọn sai trường.", D: "Con quá căng thẳng." } },
@@ -55,6 +55,7 @@ const analytics = getAnalytics(app);
             { id: "q5", title: "5. Khi con nói: “Con áp lực quá”, phản ứng của bạn là gì?", opts: { A: "“Áp lực là bình thường.”", B: "“Vì con chưa cố gắng đủ.”", C: "“Con áp lực điều gì nhất?”", D: "“Cố thêm chút, sắp thi rồi.”" } }
         ];
 
+        // Tự động tạo giao diện
         const container = document.getElementById('quiz-container');
         danhSachCauHoi.forEach(q => {
             let html = `
@@ -70,6 +71,7 @@ const analytics = getAnalytics(app);
             container.innerHTML += html;
         });
 
+        // Hàm xử lý khi phụ huynh bấm chọn
         function chon(qId, ans) {
             ['A','B','C','D'].forEach(o => {
                 const b = document.getElementById(`${qId}-${o}`);
@@ -77,6 +79,8 @@ const analytics = getAnalytics(app);
                 if(o === ans) b.classList.add('selected');
             });
             document.getElementById(`status-${qId}`).style.display = 'block';
+            
+            // Đẩy dữ liệu lên Firebase
             database.ref(`quiz_results/${qId}/${ans}`).set(firebase.database.ServerValue.increment(1));
         }
     </script>
