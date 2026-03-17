@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết Quả Thống Kê Realtime</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
+        #dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .box { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; }
+        .title { font-weight: bold; margin-bottom: 10px; color: #1a5f7a; height: 40px; overflow: hidden; }
+        #reset-btn { margin-top: 30px; padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center">Kết Quả Khảo Sát Phụ Huynh (Realtime)</h1>
+    <div id="dashboard"></div>
+    <center><button id="reset-btn" onclick="reset()">Xóa toàn bộ kết quả</button></center>
+
+    <script>
+        // --- THAY ĐOẠN NÀY BẰNG CỦA THẦY ---
+const firebaseConfig = {
+  apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
+  authDomain: "zoomquizthcs.firebaseapp.com",
+  projectId: "zoomquizthcs",
+  storageBucket: "zoomquizthcs.firebasestorage.app",
+  messagingSenderId: "658234940012",
+  appId: "1:658234940012:web:c4015c6d0cc3e291669649",
+  measurementId: "G-TCHQ3KHWXM"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+
+        const questions = [
+            {id: "q1", t: "Câu 1: Lời bố/mẹ hay nói"},
+            {id: "q2", t: "Câu 2: Điều bố/mẹ lo lắng"},
+            {id: "q3", t: "Câu 3: Nhắc nhở trước thi"},
+            {id: "q4", t: "Câu 4: Khi con điểm thấp"},
+            {id: "q5", t: "Câu 5: Khi con kêu áp lực"}
+        ];
+
+        const charts = {};
+        const dash = document.getElementById('dashboard');
+
+        questions.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'box';
+            div.innerHTML = `<div class="title">${q.t}</div><canvas id="c-${q.id}"></canvas>`;
+            dash.appendChild(div);
+
+            charts[q.id] = new Chart(document.getElementById(`c-${q.id}`), {
+                type: 'bar',
+                data: {
+                    labels: ['A','B','C','D'],
+                    datasets: [{ label: 'Số người', data: [0,0,0,0], backgroundColor: ['#3498db','#e74c3c','#f1c40f','#2ecc71'] }]
+                },
+                options: { scales: { y: { beginAtZero: true, ticks: {stepSize: 1} } }, plugins: { legend: {display: false} } }
+            });
+        });
+
+        database.ref('quiz_results').on('value', snap => {
+            const data = snap.val() || {};
+            questions.forEach(q => {
+                const res = data[q.id] || {};
+                charts[q.id].data.datasets[0].data = [res.A||0, res.B||0, res.C||0, res.D||0];
+                charts[q.id].update();
+            });
+        });
+
+        function reset() { if(confirm("Xóa hết dữ liệu?")) database.ref('quiz_results').remove(); }
+    </script>
+</body>
+</html>

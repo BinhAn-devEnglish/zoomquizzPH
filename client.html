@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khảo Sát Tâm Lý Khối 9</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 15px; color: #333; line-height: 1.5; }
+        .header { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .question-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .question-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1a5f7a; }
+        .btn {
+            display: block; width: 100%; text-align: left; padding: 15px; margin-bottom: 10px;
+            font-size: 16px; background-color: #f8f9fa; color: #2c3e50; border: 2px solid #dee2e6;
+            border-radius: 10px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn.selected { background-color: #27ae60; color: white; border-color: #2ecc71; font-weight: bold; }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .status { color: #e67e22; font-weight: bold; margin-top: 10px; display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>Đồng Hành Cùng Con Vượt Vũ Môn</h2>
+        <p>Phụ huynh vui lòng chọn phương án phù hợp nhất với mình.</p>
+    </div>
+    
+    <div id="quiz-container"></div>
+
+    <script>
+        // --- THAY ĐOẠN NÀY BẰNG CỦA THẦY ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
+  authDomain: "zoomquizthcs.firebaseapp.com",
+  projectId: "zoomquizthcs",
+  storageBucket: "zoomquizthcs.firebasestorage.app",
+  messagingSenderId: "658234940012",
+  appId: "1:658234940012:web:c4015c6d0cc3e291669649",
+  measurementId: "G-TCHQ3KHWXM"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+
+        const danhSachCauHoi = [
+            { id: "q1", title: "1. Trong giai đoạn ôn thi, điều bố/ mẹ thường nói với con nhiều nhất là gì?", opts: { A: "“Học thêm chút nữa.”", B: "“Con cố gắng lên.”", C: "“Đừng chủ quan.”", D: "“Bố mẹ tin con.”" } },
+            { id: "q2", title: "2. Trong giai đoạn ôn thi vào 10, điều khiến bố/ mẹ lo nhất là gì?", opts: { A: "Con học chưa đủ nhiều.", B: "Con thiếu tự tin.", C: "Con chọn sai trường.", D: "Con quá căng thẳng." } },
+            { id: "q3", title: "3. Buổi tối trước kỳ thi thử, bố/ mẹ thường nhắc con điều gì nhất?", opts: { A: "Ôn lại kỹ các dạng khó.", B: "Ngủ sớm để giữ sức.", C: "Xem lại các lỗi sai.", D: "Dặn dò thêm điều quan trọng." } },
+            { id: "q4", title: "4. Khi con thi thử điểm thấp, phản ứng đầu tiên của bố/mẹ là gì?", opts: { A: "Hỏi con sai ở đâu để sửa?", B: "Hỏi con có gặp khó khăn gì không?", C: "So sánh nhẹ với bạn khác.", D: "Nói: Không sao, lần sau sẽ tốt hơn." } },
+            { id: "q5", title: "5. Khi con nói: “Con áp lực quá”, phản ứng của bạn là gì?", opts: { A: "“Áp lực là bình thường.”", B: "“Vì con chưa cố gắng đủ.”", C: "“Con áp lực điều gì nhất?”", D: "“Cố thêm chút, sắp thi rồi.”" } }
+        ];
+
+        const container = document.getElementById('quiz-container');
+        danhSachCauHoi.forEach(q => {
+            let html = `
+                <div class="question-card">
+                    <div class="question-title">${q.title}</div>
+                    <button class="btn" id="${q.id}-A" onclick="chon('${q.id}', 'A')">A. ${q.opts.A}</button>
+                    <button class="btn" id="${q.id}-B" onclick="chon('${q.id}', 'B')">B. ${q.opts.B}</button>
+                    <button class="btn" id="${q.id}-C" onclick="chon('${q.id}', 'C')">C. ${q.opts.C}</button>
+                    <button class="btn" id="${q.id}-D" onclick="chon('${q.id}', 'D')">D. ${q.opts.D}</button>
+                    <div class="status" id="status-${q.id}">✓ Đã ghi nhận</div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+        function chon(qId, ans) {
+            ['A','B','C','D'].forEach(o => {
+                const b = document.getElementById(`${qId}-${o}`);
+                b.disabled = true;
+                if(o === ans) b.classList.add('selected');
+            });
+            document.getElementById(`status-${qId}`).style.display = 'block';
+            database.ref(`quiz_results/${qId}/${ans}`).set(firebase.database.ServerValue.increment(1));
+        }
+    </script>
+</body>
+</html>
