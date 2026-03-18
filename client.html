@@ -31,7 +31,7 @@
     <div id="quiz-container"></div>
 
     <script>
-        // Cấu hình Firebase đã được chuẩn hóa
+        // Cấu hình Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
             authDomain: "zoomquizthcs.firebaseapp.com",
@@ -42,20 +42,17 @@
             appId: "1:658234940012:web:c4015c6d0cc3e291669649"
         };
 
-        // Khởi tạo Firebase v8
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Danh sách câu hỏi
+        // Danh sách 4 câu hỏi chuẩn
         const danhSachCauHoi = [
-            { id: "q1", title: "1. Trong giai đoạn ôn thi, điều bố/ mẹ thường nói với con nhiều nhất là gì?", opts: { A: "“Học thêm chút nữa.”", B: "“Con cố gắng lên.”", C: "“Đừng chủ quan.”", D: "“Bố mẹ tin con.”" } },
-            { id: "q2", title: "2. Trong giai đoạn ôn thi vào 10, điều khiến bố/ mẹ lo nhất là gì?", opts: { A: "Con học chưa đủ nhiều.", B: "Con thiếu tự tin.", C: "Con chọn sai trường.", D: "Con quá căng thẳng." } },
-            { id: "q3", title: "3. Buổi tối trước kỳ thi thử, bố/ mẹ thường nhắc con điều gì nhất?", opts: { A: "Ôn lại kỹ các dạng khó.", B: "Ngủ sớm để giữ sức.", C: "Xem lại các lỗi sai.", D: "Dặn dò thêm điều quan trọng." } },
-            { id: "q4", title: "4. Khi con thi thử điểm thấp, phản ứng đầu tiên của bố/mẹ là gì?", opts: { A: "Hỏi con sai ở đâu để sửa?", B: "Hỏi con có gặp khó khăn gì không?", C: "So sánh nhẹ với bạn khác.", D: "Nói: Không sao, lần sau sẽ tốt hơn." } },
-            { id: "q5", title: "5. Khi con nói: “Con áp lực quá”, phản ứng của bạn là gì?", opts: { A: "“Áp lực là bình thường.”", B: "“Vì con chưa cố gắng đủ.”", C: "“Con áp lực điều gì nhất?”", D: "“Cố thêm chút, sắp thi rồi.”" } }
+            { id: "q1", title: "Câu 1: Khi con nói “Con áp lực quá”, bạn thường nghĩ nên:", opts: { A: "Trấn an để con yên tâm hơn", B: "Nhắc con rằng ai cũng phải trải qua áp lực", C: "Động viên để con cố gắng thêm", D: "Giúp con nhìn nhận vấn đề tích cực hơn" } },
+            { id: "q2", title: "Câu 2: Khi con làm bài chưa tốt, phản ứng đầu tiên của bạn thường là:", opts: { A: "Giúp con phân tích lỗi sai để rút kinh nghiệm", B: "Nhắc con cần cẩn thận hơn lần sau", C: "Chỉ ra những điểm con chưa làm tốt", D: "Hướng dẫn con cách làm đúng" } },
+            { id: "q3", title: "Câu 3: Việc thường xuyên hỏi con “Hôm nay con học đến đâu rồi?” theo bạn là:", opts: { A: "Thể hiện sự quan tâm sát sao", B: "Giúp con duy trì kỷ luật học tập", C: "Tránh để con bị chểnh mảng", D: "Là cách để ba mẹ nắm được tiến độ học của con" } },
+            { id: "q4", title: "Câu 4: Trong giai đoạn ôn thi, bạn nghĩ việc thường xuyên nhắc đến kỳ thi với con là:", opts: { A: "Giúp con luôn ý thức được mục tiêu phía trước", B: "Tạo sự tập trung và nghiêm túc trong học tập", C: "Giúp con không bị sao nhãng bởi những điều khác", D: "Là cách để gia đình cùng quan tâm và đồng hành với con" } }
         ];
 
-        // Tự động tạo giao diện
         const container = document.getElementById('quiz-container');
         danhSachCauHoi.forEach(q => {
             let html = `
@@ -71,7 +68,6 @@
             container.innerHTML += html;
         });
 
-        // Hàm xử lý khi phụ huynh bấm chọn
         function chon(qId, ans) {
             ['A','B','C','D'].forEach(o => {
                 const b = document.getElementById(`${qId}-${o}`);
@@ -79,8 +75,6 @@
                 if(o === ans) b.classList.add('selected');
             });
             document.getElementById(`status-${qId}`).style.display = 'block';
-            
-            // Đẩy dữ liệu lên Firebase
             database.ref(`quiz_results/${qId}/${ans}`).set(firebase.database.ServerValue.increment(1));
         }
     </script>
