@@ -9,21 +9,9 @@
     <style>
         body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
         h1 { text-align: center; color: #1a5f7a; margin-bottom: 30px; }
-        /* Tăng kích thước cột để có chỗ chứa câu hỏi dài */
         #dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; }
         .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        
-        /* Căn lề trái và cho phép tự động xuống dòng cho câu hỏi đầy đủ */
-        .title { 
-            font-weight: bold; 
-            margin-bottom: 15px; 
-            color: #2c3e50; 
-            min-height: 45px; 
-            font-size: 15px;
-            line-height: 1.5;
-            text-align: left;
-        }
-        
+        .title { font-weight: bold; margin-bottom: 15px; color: #2c3e50; min-height: 45px; font-size: 15px; line-height: 1.5; text-align: left; }
         #reset-btn { margin-top: 30px; padding: 12px 25px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
         #reset-btn:hover { background: #c0392b; }
     </style>
@@ -36,7 +24,6 @@
     </div>
 
     <script>
-        // Cấu hình Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC9oCTAWtIKvSmjKaI9CGrANIig5be6fzM",
             authDomain: "zoomquizthcs.firebaseapp.com",
@@ -50,19 +37,17 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Đã cập nhật đầy đủ câu hỏi và các đáp án A B C D để hiển thị
+        // Danh sách 4 câu hỏi chuẩn
         const questions = [
-            { id: "q1", title: "Câu 1: Trong giai đoạn ôn thi, điều bố/ mẹ thường nói với con nhiều nhất là gì?", opts: { A: "“Học thêm chút nữa.”", B: "“Con cố gắng lên.”", C: "“Đừng chủ quan.”", D: "“Bố mẹ tin con.”" } },
-            { id: "q2", title: "Câu 2: Trong giai đoạn ôn thi vào 10, điều khiến bố/ mẹ lo nhất là gì?", opts: { A: "Con học chưa đủ nhiều.", B: "Con thiếu tự tin.", C: "Con chọn sai trường.", D: "Con quá căng thẳng." } },
-            { id: "q3", title: "Câu 3: Buổi tối trước kỳ thi thử, bố/ mẹ thường nhắc con điều gì nhất?", opts: { A: "Ôn lại kỹ các dạng khó.", B: "Ngủ sớm để giữ sức.", C: "Xem lại các lỗi sai.", D: "Dặn dò thêm điều quan trọng." } },
-            { id: "q4", title: "Câu 4: Khi con thi thử điểm thấp, phản ứng đầu tiên của bố/mẹ là gì?", opts: { A: "Hỏi con sai ở đâu để sửa?", B: "Hỏi con có gặp khó khăn gì không?", C: "So sánh nhẹ với bạn khác.", D: "Nói: Không sao, lần sau sẽ tốt hơn." } },
-            { id: "q5", title: "Câu 5: Khi con nói: “Con áp lực quá”, phản ứng của bạn là gì?", opts: { A: "“Áp lực là bình thường.”", B: "“Vì con chưa cố gắng đủ.”", C: "“Con áp lực điều gì nhất?”", D: "“Cố thêm chút, sắp thi rồi.”" } }
+            { id: "q1", title: "Câu 1: Khi con nói “Con áp lực quá”, bạn thường nghĩ nên:", opts: { A: "Trấn an để con yên tâm hơn", B: "Nhắc con rằng ai cũng phải trải qua áp lực", C: "Động viên để con cố gắng thêm", D: "Giúp con nhìn nhận vấn đề tích cực hơn" } },
+            { id: "q2", title: "Câu 2: Khi con làm bài chưa tốt, phản ứng đầu tiên của bạn thường là:", opts: { A: "Giúp con phân tích lỗi sai để rút kinh nghiệm", B: "Nhắc con cần cẩn thận hơn lần sau", C: "Chỉ ra những điểm con chưa làm tốt", D: "Hướng dẫn con cách làm đúng" } },
+            { id: "q3", title: "Câu 3: Việc thường xuyên hỏi con “Hôm nay con học đến đâu rồi?” theo bạn là:", opts: { A: "Thể hiện sự quan tâm sát sao", B: "Giúp con duy trì kỷ luật học tập", C: "Tránh để con bị chểnh mảng", D: "Là cách để ba mẹ nắm được tiến độ học của con" } },
+            { id: "q4", title: "Câu 4: Trong giai đoạn ôn thi, bạn nghĩ việc thường xuyên nhắc đến kỳ thi với con là:", opts: { A: "Giúp con luôn ý thức được mục tiêu phía trước", B: "Tạo sự tập trung và nghiêm túc trong học tập", C: "Giúp con không bị sao nhãng bởi những điều khác", D: "Là cách để gia đình cùng quan tâm và đồng hành với con" } }
         ];
 
         const charts = {};
         const dash = document.getElementById('dashboard');
 
-        // Khởi tạo 5 biểu đồ
         questions.forEach(q => {
             const div = document.createElement('div');
             div.className = 'box';
@@ -79,13 +64,10 @@
                     scales: { y: { beginAtZero: true, ticks: {stepSize: 1} } }, 
                     plugins: { 
                         legend: {display: false},
-                        // Cấu hình Tooltip (hiển thị khi di chuột vào cột)
                         tooltip: {
                             callbacks: {
                                 title: function(context) {
-                                    // Lấy ký tự A, B, C, D
                                     const labelLetter = context[0].label; 
-                                    // Ghép với nội dung đầy đủ của đáp án
                                     return labelLetter + ". " + q.opts[labelLetter];
                                 },
                                 label: function(context) {
@@ -102,7 +84,6 @@
             });
         });
 
-        // Lắng nghe dữ liệu realtime
         database.ref('quiz_results').on('value', snap => {
             const data = snap.val() || {};
             questions.forEach(q => {
@@ -112,7 +93,6 @@
             });
         });
 
-        // Xóa dữ liệu
         function resetData() { 
             if(confirm("Thầy có chắc chắn muốn xóa toàn bộ kết quả hiện tại trên biểu đồ không?")) {
                 database.ref('quiz_results').remove(); 
